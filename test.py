@@ -6,10 +6,11 @@ import numpy as np
 import sg.dcn 
 
 import torch
-import torch.backends.cudnn as cudnn
 from yolact import Yolact
-from data import cfg, set_cfg, set_dataset
+from data import set_cfg
 from utils.augmentations import BaseTransform, FastBaseTransform, Resize
+from eval import prep_display
+
 
 from torch.onnx.utils import _model_to_graph
 from torch.onnx import OperatorExportTypes
@@ -20,30 +21,42 @@ from pytorch2sg.engine import PytorchEngine
 
 
 
-
 if __name__ == '__main__':
   #cudnn.fastest = True
   torch.set_default_tensor_type('torch.cuda.FloatTensor')
   set_cfg('yolact_plus_resnet50_config')
   net = Yolact()
   net.load_weights(sys.argv[1])
+
   net.eval()
 
   # # run torch  
   # img_path = './data/example.jpg'
-  # img = torch.from_numpy(cv2.imread(img_path)).cuda().float()
-  # img = FastBaseTransform()(img.unsqueeze(0))
+  # img_1 = torch.from_numpy(cv2.imread(img_path)).cuda().float()
+  # img = FastBaseTransform()(img_1.unsqueeze(0))
+  # print(img.shape)
   # preds = net(img)
+  # # %1995, %2005, %2001, %2002, %1632
   # print(preds.keys())
+  # print(preds['loc'].shape)
+  # print(preds['conf'].shape)
+  # print(preds['mask'].shape)
 
   # # run runtime
-  # rb_net = rt.Network('./sg/yolact_plus.sg', dp=[rt.CPU])
+  # rb_net = rt.Network('./sg/yolact_plus.sg', dp=[rt.GPU])
   # outputs = rb_net.Run(img.cpu().detach().numpy().astype(np.float32))
   # print(outputs.keys())
 
+  # print(np.max(outputs['1995'] - preds['loc'].cpu().detach().numpy()))
+  # print(np.max(outputs['2005'] - preds['conf'].cpu().detach().numpy()))
+  # print(np.max(outputs['2001'] - preds['mask'].cpu().detach().numpy()))
+
+  # print(outputs['1995'].reshape(-1)[20:40])
+  # print( preds['loc'].cpu().detach().numpy().reshape(-1)[20:40])
+
   # parser
-  graph, params_dict, torch_out = _model_to_graph(net, (torch.randn(1, 3, 550, 550).cuda(),), operator_export_type=OperatorExportTypes.RAW)
-  print(graph)
+  # graph, params_dict, torch_out = _model_to_graph(net, (torch.randn(1, 3, 550, 550).cuda(),), operator_export_type=OperatorExportTypes.RAW)
+  # print(graph)
   # engine = PytorchEngine()
   # g = PytorchGraph()
   # g.load(net, input_shape=[1, 3, 550, 550])

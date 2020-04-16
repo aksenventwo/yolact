@@ -666,7 +666,6 @@ class Yolact(nn.Module):
 
                 if cfg.use_objectness_score:
                     objectness = torch.sigmoid(pred_outs['conf'][:, :, 0])
-                    
                     pred_outs['conf'][:, :, 1:] = (objectness > 0.10)[..., None] \
                         * F.softmax(pred_outs['conf'][:, :, 1:], dim=-1)
                     
@@ -674,6 +673,8 @@ class Yolact(nn.Module):
                     pred_outs['conf'] = F.softmax(pred_outs['conf'], -1)
             return pred_outs
             #return self.detect(pred_outs, self)
+            #las_out = self.detect(pred_outs, self)
+            #return las_out[0]['detection']
 
 
 
