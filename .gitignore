@@ -158,4 +158,5 @@ vid/
 vidres/
 
 _.py
-sg/
+*.sg 
+*.pth
